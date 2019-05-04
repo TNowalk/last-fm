@@ -105,6 +105,7 @@ class LastFM {
         return {
           type: 'album',
           name: album.name,
+          mbid: album.mbid,
           artistName: album.artist.name || album.artist,
           listeners: (
             (album.playcount && Number(album.playcount)) ||
@@ -126,6 +127,7 @@ class LastFM {
         return {
           type: 'track',
           name: track.name,
+          mbid: track.mbid,
           artistName: track.artist.name || track.artist,
           duration: track.duration && Number(track.duration), // optional
           listeners: listeners && Number(listeners), // optional
