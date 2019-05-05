@@ -558,20 +558,36 @@ class LastFM {
   }
 
   trackInfo (opts, cb) {
-    if (!opts.name || !opts.artistName) {
-      return cb(new Error('Missing required params: name, artistName'))
+    console.log(opts);
+    if ((!opts.name || !opts.artistName) && !opts.mbid) {
+      return cb(new Error('Missing required params: name and artistName, or mbid'))
     }
     const params = {
       method: 'track.getInfo',
-      track: opts.name,
-      artist: opts.artistName,
       autocorrect: 1
     }
+
+    if (opts.mbid) {
+      params.mbid = opts.mbid;
+    } else {
+      params.track = opts.name;
+      params.artist = opts.artistName;
+    }
+
     this._sendRequest(params, 'track', (err, track) => {
       if (err) return cb(err)
       cb(null, {
         type: 'track',
         name: track.name,
+        mbid: track.mbid,
+        artist: {
+          name: track.artist.name,
+          mbid: track.artist.mbid,
+        },
+        album: {
+          title: track.album && track.album.title,
+          mbid: track.album && track.album.mbid,
+        },
         artistName: track.artist.name,
         albumName: track.album && track.album.title,
         listeners: Number(track.listeners),
