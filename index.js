@@ -557,45 +557,46 @@ class LastFM {
     })
   }
 
-  trackInfo (opts, cb) {
-    console.log(opts);
-    if ((!opts.name || !opts.artistName) && !opts.mbid) {
-      return cb(new Error('Missing required params: name and artistName, or mbid'))
-    }
-    const params = {
-      method: 'track.getInfo',
-      autocorrect: 1
-    }
+  async trackInfo (opts, cb) {
+    return new Promise((resolve, reject) => {
+      if ((!opts.name || !opts.artistName) && !opts.mbid) {
+        reject(new Error('Missing required params: name and artistName, or mbid'))
+      }
+      const params = {
+        method: 'track.getInfo',
+        autocorrect: 1
+      }
 
-    if (opts.mbid) {
-      params.mbid = opts.mbid;
-    } else {
-      params.track = opts.name;
-      params.artist = opts.artistName;
-    }
+      if (opts.mbid) {
+        params.mbid = opts.mbid;
+      } else {
+        params.track = opts.name;
+        params.artist = opts.artistName;
+      }
 
-    this._sendRequest(params, 'track', (err, track) => {
-      if (err) return cb(err)
-      cb(null, {
-        type: 'track',
-        name: track.name,
-        mbid: track.mbid,
-        artist: {
-          name: track.artist.name,
-          mbid: track.artist.mbid,
-        },
-        album: {
-          title: track.album && track.album.title,
-          mbid: track.album && track.album.mbid,
-        },
-        artistName: track.artist.name,
-        albumName: track.album && track.album.title,
-        listeners: Number(track.listeners),
-        duration: Math.ceil(track.duration / 1000),
-        images: track.album && this._parseImages(track.album.image),
-        tags: this._parseTags(track.toptags)
+      this._sendRequest(params, 'track', (err, track) => {
+        if (err) reject(err)
+        resolve({
+          type: 'track',
+          name: track.name,
+          mbid: track.mbid,
+          artist: {
+            name: track.artist.name,
+            mbid: track.artist.mbid,
+          },
+          album: {
+            title: track.album && track.album.title,
+            mbid: track.album && track.album.mbid,
+          },
+          artistName: track.artist.name,
+          albumName: track.album && track.album.title,
+          listeners: Number(track.listeners),
+          duration: Math.ceil(track.duration / 1000),
+          images: track.album && this._parseImages(track.album.image),
+          tags: this._parseTags(track.toptags)
+        })
       })
-    })
+    });
   }
 
   trackSimilar (opts, cb) {
