@@ -557,7 +557,7 @@ class LastFM {
     })
   }
 
-  async trackInfo (opts, cb) {
+  async trackInfo (opts) {
     return new Promise((resolve, reject) => {
       if ((!opts.name || !opts.artistName) && !opts.mbid) {
         reject(new Error('Missing required params: name and artistName, or mbid'))
